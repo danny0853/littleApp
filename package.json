@@ -1,0 +1,19 @@
+{
+  "name": "blog",
+  "version": "0.0.1",
+  "private": true,
+  "scripts": {
+    "start": "nodemon app.js"
+  },
+  "dependencies": {
+    "ali-oss": "^6.0.0",
+    "aliyun-apisign": "^1.0.2",
+    "body-parser": "^1.18.2",
+    "cookie-parser": "^1.4.3",
+    "ejs": "^2.6.1",
+    "express": "^4.16.3",
+    "express-router": "0.0.1",
+    "mysql": "^2.15.0",
+    "redis": "^2.8.0"
+  }
+}

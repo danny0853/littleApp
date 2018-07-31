@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="tw">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=yes">
+<head>	
+
+<link rel="stylesheet" href="css/bootstrap.min.css" />
+
+<script src="js/jquery-3.3.1.min.js" ></script>
+<script src="js/popper.min.js"></script>
+<script src="js/bootstrap.min.js"></script>
+
+<script type="css">
+
+.table-background {
+	background-colour:#CCC;
+}
+
+
+</script>
+
+<script>
+
+
+var i =0;
+
+window.localStorage.location="Macao";
+//window.localStorage.setItem('shortLocation','MO');
+window.localStorage.currency="MOP";
+window.localStorage.setItem('currency','$');
+
+
+
+function executeEmergencyInterval() {
+  $.ajax({
+  url:'http://www.dezontec.net/rss.php?type=emergencyMsg',
+  async:true,
+  cache:true,
+  dataType:"json",
+ 
+  success: function(data) {
+
+
+    //console.log(data['msgCounter']);
+
+
+
+    if(parseInt(data['msgCounter'])>0) {
+      if(data==null) {
+        $('#emergencyArea').hide(200);
+      } else { 
+        if($('#emergencyArea').is(":visible")) {
+           $('#emergencyMsg').html(data['msgContent'][0]['title']);
+           
+        } else {
+          $('#emergencyMsg').html(data['msgContent'][0]['title']);
+          $('#emergencyArea').show(200);
+        }
+      }
+    } else {
+       $('#emergencyArea').hide(200);
+    }
+  }
+});
+}
+
+
+
+function executeInterval(data) {
+  var title = '';
+  var availableDate = '';
+  var description = '';
+  var image;
+  
+  var y =0;
+
+  var i = parseInt($('#timer').html());
+
+  for(; i < data['channel']['item'].length; i++) {
+
+    if(data['channel']['item'][i].title.indexOf('(') > -1 ) {
+      title = data['channel']['item'][i].title.substring(0,data['channel']['item'][i].title.indexOf('('));
+      availableDate = data['channel']['item'][i].title.substring(data['channel']['item'][i].title.indexOf('(')+1,data['channel']['item'][i].title.indexOf(')'));
+
+
+
+    }
+
+    if(data['channel']['item'][i].image==null) {
+      image = '';
+    }  else {
+      image = data['channel']['item'][i].image;
+    }
+
+
+
+    if(data['channel']['item'][i].description.length > 62) {
+       description = data['channel']['item'][i].description.substring(0,62);
+    } else {
+       description = data['channel']['item'][i].description;
+    }
+
+
+	  $('#contentDiv'+y).hide().slideDown(3000);
+      $('#title' + y ).html(title + '<br/>').fadeIn('slow');
+      $('#availableDate'+y).html(availableDate + '<br/>').fadeIn('slow');
+
+      $('#image'+y).attr('src',image);
+
+      $('#description'+y).html(description + '<br/>').fadeIn('slow');
+      y++;
+
+
+
+
+       $('#timer').html(i);
+
+
+
+      if(i%2===1&&i!==0){
+        $('#timer').html(i+1);  
+        return i ;
+      }
+
+
+     
+  }
+
+
+  if(i >=data['channel']['item'].length) {
+     $('#timer').html(0);
+  }
+
+ 
+}
+
+
+
+function executeWeatherData(data) {
+  var now = new Date(Date.now());
+  var month = now.getMonth()+1;
+  var day = now.getDate();
+  var temperture = '';
+  
+  var rssWeather = data['channel']['item'].description.split('<td');
+
+  
+    if(rssWeather.length > 1) {
+    temperture = /\d+/.exec(rssWeather[2]);
+    } else {
+      temperture = '';
+    }
+
+
+  
+  var formatted = now.getFullYear() + '-' +
+    (month<10 ? '0' : '') + month + '-' +
+    (day<10 ? '0' : '') + day + ' '+  (now.getHours()<10 ? '0' : '') + now.getHours() + ":" 
+    +  (now.getMinutes()<10 ? '0' : '') + now.getMinutes() ;
+  $('#dateTime').html(formatted);
+
+  if(temperture.length > 0 ) 
+  $('#weather').html(" " + temperture[0] + "&#176;C");
+
+  
+
+
+  //console.log(data['channel']);
+}
+
+
+
+function sleep(delay) {
+    var start = new Date().getTime();
+    while (new Date().getTime() < start + delay)
+        ;
+}
+
+$().ready(function(){
+
+var items;
+var weather;
+
+
+//    $("#emergencyArea").append(window.localStorage.location);
+//    $("#emergencyArea").append(window.localStorage.getItem('currency'));
+//    $('#emergencyArea').show(200);
+
+
+
+$.ajax({
+  url:'http://www.dezontec.com/weather.php',
+  async:false,
+  cache:true,
+  dataType:"json",
+ 
+  success: function(data) {
+    weather = data; 
+  executeWeatherData(data);
+  }
+});
+
+
+$.ajax({
+  url:'http://www.dezontec.net/rss.php',
+  async:false,
+  cache:true,
+  dataType:"json",
+  success: function(data) {
+  items = data; 
+  
+  
+  executeInterval(data);
+
+ 
+   setInterval(executeInterval, items['eventTimer'], items);
+   setInterval(executeWeatherData,  items['weatherTimer'], weather);
+   setInterval(executeEmergencyInterval,items['emergencyTimer']);
+
+  }
+});
+
+
+//console.log(items);
+
+
+
+
+
+     
+
+
+      
+
+
+});
+
+</script>
+
+<style>
+
+body, html {
+    width: 1080px;
+
+    height: 1920px;
+}
+
+
+.bg {
+  background-image: url('images/background.jpg');    
+  height: 100%;
+  background-size: 1080px 1920px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+</style>
+
+</head>
+
+
+
+<body>
+
+
+<div class="container-fluid bg" style="position: relative;" >
+
+
+<div style="position: absolute; bottom: top 0px; left: 0px;">
+  <div class="col-md-13" style="width: 1080px; ">
+     <div class="col-md-12" style="float: right; background-color: black; font-size: 32px; font-weight: bold; vertical-align:bottom; text-align: right;  height: 60px; 
+     color:white; ">
+        <span id="dateTime"></span><span id="weather"></span>
+     </div>
+  </div>
+</div>
+
+
+<div style="position: absolute; top: 60px; left: 0px;">
+  <div class="col-md-13" style="width: 1080px; ">
+     <div class="col-md-12" id="emergencyArea"  style="display: none; float: left; background-color: red; font-size: 32px; font-weight: bold; vertical-align:bottom; text-align: right;  height: 60px; 
+     color:white; ">
+        <span id="emergencyMsg" ></span>
+     </div>
+  </div>
+</div>
+
+
+
+<div id="timer" style="display: none;">0</div>
+
+<!--
+<div class="row" style="position: fixed; bottom: 150px; left: 0px;">
+  <div class="col-md-13" style="width: 1080px; ">
+    <div class="col-md-5" style="width:370px; border:1px solid #CCC; padding-bottom: 15px; float: left; background-color: white; height:150px; border-top: 10px solid #CCC; border-bottom: 5px solid #CCC;">
+       <span class="col-md-3" style="margin-top: 5px; margin-bottom:5px; display:inline-block; vertical-align: top;"><img src="test1.jpg" width="80" style="display:absolute; top:10 px; left:10px;"  ></img></span>
+       <span class="col-md-8" style="display:inline-block;z-index: 999">
+         <div id="title0" ></div>
+         <div id="availableDate0"></div>
+         <div id="description0"></div>
+
+       </span>
+
+    </div>
+
+    <div class="col-md-5" style=" width:365px; border:1px solid #CCC; padding-bottom: 15px; float: left; background-color: white; height:150px;border-top: 10px solid #CCC; border-bottom: 5px solid #CCC;">
+       <span class="col-md-3" style="  margin-top: 5px; margin-bottom:5px; display:inline-block; vertical-align: top;"><img src="test1.jpg" width="80"  ></img></span>
+       <span class="col-md-8" style="display:inline-block; z-index: 999">
+         <div id="title1" ></div>
+         
+         <div id="availableDate1"></div>
+         <div id="description1"></div>
+
+       </span>
+
+    </div>
+    </div>
+-->
+
+<div class="row" style="position: fixed; bottom: 0px; left : 735px;  height: 480px; ">
+<div class="col-md-13" style="width: 1080px; h">
+  
+  <div style=" width: 360px; height: 240px; position: absolute; top:0px;">
+    <img src="images/QRCODE1.PNG" width="360" height="240">
+  </div>
+  
+  <div style=" width: 360px; height: 240px; position: absolute; top: 240px;">
+    <img src="images/QRCODE2.PNG" width="360" height="240">
+  
+  </div>
+</div>
+</div>
+
+<div class="row" style="position: fixed; bottom: 10px; left: 25px; ">
+<div class="col-md-13" style="width: 1080px; ">
+  <div id="contentDiv0" class="col-md-5" style="width:340px; border:1px solid #CCC; padding-right: 0px;padding-left:0px; padding-bottom: 15px; float: left; background-color: white; height:250px; border-top: 5px solid #CCC; border-bottom: 0px solid #CCC;">
+       <span class="col-md-3" style="margin-top: 5px; margin-right:10px; margin-bottom:5px; display:inline-block; vertical-align: top;"><img id="image0" src="test1.jpg" width="90" style="display:absolute; top:10 px; left:10px;"  ></img></span>
+       <span class="col-md-8" style="display:inline-block;z-index: 999; padding-right: 0px;">
+         <div id="title0" ></div>
+         <div id="availableDate0"></div>
+         <div id="description0"></div>
+
+       </span>
+
+    </div>
+
+    <div id="contentDiv1" class="col-md-5" style=" width:340px; border:1px solid #CCC; margin-left:15px; padding-bottom: 15px; padding-left:0px; padding-right: 0px; float: left; background-color: white;height:250px; border-top: 5px solid #CCC; border-bottom: 0px solid #CCC;">
+       <span class="col-md-3" style="  margin-top: 5px; margin-bottom:5px;margin-right: 10px; display:inline-block; vertical-align: top;"><img id="image1" src="test1.jpg" width="90"  ></img></span>
+       <span class="col-md-8" style="display:inline-block; z-index: 999; padding-right: 0px;">
+         <div id="title1" ></div>
+         <div id="availableDate1"></div>
+         <div id="description1"></div>
+
+       </span>
+
+    
+  <div >
+
+  </div>
+</div>
+</div>
+
+</div>
+
+</body>
+
+</thml>
+

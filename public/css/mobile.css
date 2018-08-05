@@ -1,0 +1,19 @@
+img{
+    width: 100%;
+}
+
+
+@media(max-width: 768px){
+    .navbar-right form{
+        display:none;
+    }
+}
+
+@media(max-width: 568px){
+    .jumbotron{
+        text-align: center;
+    }
+    footer{
+        text-align: center;
+    }
+}

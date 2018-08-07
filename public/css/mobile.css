@@ -17,3 +17,30 @@ img{
         text-align: center;
     }
 }
+
+.row-margin-top {
+    margin-top: 10px;
+}
+
+.img-shadow {
+	background-color: transparent;
+	box-shadow:0px 0px 12px 5px #ccc;
+}
+
+
+/* SCSS */
+$custom-gutter-width: 200px;     // 將欄距改成 20px
+.custom-gutters {
+    &.container {
+        padding-left: $custom-gutter-width / 2;
+        padding-right: $custom-gutter-width / 2;
+    }
+    .row {
+        margin-left: -($custom-gutter-width / 2);
+        margin-right: -($custom-gutter-width / 2);
+    }
+    .col {
+        padding-left: $custom-gutter-width / 2;
+        padding-right: $custom-gutter-width / 2;
+    }
+}

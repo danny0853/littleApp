@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Editable Table Template | PrepBootstrap</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+
+    <link type="text/css" rel="stylesheet" href="/css/jsgrid/jsgrid.min.css" />
+	<link type="text/css" rel="stylesheet" href="/css/jsgrid/jsgrid-theme.min.css" />
+	<script type="text/javascript" src="/js/jsgrid/jsgrid.js"></script>
+	
+
+
+<body>
+
+<script>
+
+$().ready(function() {
+
+
+    var clients = <%- JSON.stringify(data) %>;
+
+  
+    $("#jsGrid").jsGrid({
+        width: "100%",
+       
+ 
+        inserting: false,
+        editing: false,
+        sorting: true,
+        paging: true,
+ 
+        pageSize: 20,
+
+        data: clients,
+ 		
+
+        fields: [
+            { name: "rank", type: "number", width: 20, title: '編號' ,},
+            { name: "member_name", type: "text", width: 50 , title: '會員名稱' },
+            { name: "resller_name", type: "text", width: 80  , title: '分銷商名稱'},
+            { name: "subscribe_time", type: "text" ,width: 80 , title: '關注時間' },
+            { name: "order_number", type: "text" ,width: 80  , title: '訂單編號' ,  cellRenderer : orderDetail },
+            { name: "total_pay_money", type: "text" ,width: 50 , title: '總付款' },
+            { name: "value", type: "text" ,width: 40 , title : '分成金額' },
+            { type: "control" }
+        ]
+    });
+
+
+    function orderDetail(value,item) {
+    	value =  '<a href="/macauo2o/orderDetail/' + value + '">'+value+'</a>' ;
+    	return $("<td>").append(value);
+    }
+ 
+});
+</script>
+
+
+<div class="container">
+	<div class="rows">
+<div class="col-md-12 col-sm-12 col-l-12">
+    <div class="card ">
+        <div class="card-header">
+            <h4 class="text-xs-center">經由分銷商的訂單 <span class="fa fa-edit float-xs-right bigicon"></span></h4>
+        </div>
+        <div class="card-block text-xs-center">            
+            <div id="jsGrid"></div>
+        </div>
+    </div>
+</div>
+</div>
+</body>
+</html>

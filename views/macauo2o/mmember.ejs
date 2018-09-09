@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<link href="https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-MCw98/SFnGE8fJT3GXwEOngsV7Zt27NXFoaoApmYm81iuXoPkFOJwJ8ERdknLPMO" crossorigin="anonymous">
+   <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script src=" https://stackpath.bootstrapcdn.com/bootstrap/4.1.3/js/bootstrap.min.js"></script>
+	
+
+	<style>
+	table {
+		 border: 1px solid black;
+		  width: 1024px;
+	}
+	th, td {
+	    border: 1px solid black;
+	    height: 50px;
+	}
+	</style>
+
+</head>
+
+<body>
+ 
+<script>
+
+$(function() {
+ 	$('#findUser').click(function(){
+ 		$.ajax({
+		  type: "POST",
+		  url: '/macauo2o/checkUser',
+		  dataType: 'json',
+		  data: {
+		  	mobile : $('#mobile').val() 
+		  },
+		  success: function(data) {
+		  
+		  console.log(data);
+		  
+		  	$.each(data,function(index,value) {
+		  		var img;
+		  		if(value.head_img_url!=null) {
+		  			img = value.head_img_url;
+		  		} else {
+		  			img = "https://avatars.plurk.com/5015534-big34.jpg";
+		  		}
+				var customer = '/macauo2o/customerDetail?member_id='+$.trim(value.member_id) ;
+				var resller = '/macauo2o/secondReseller?member_id='+$.trim(value.member_id) ;
+				
+
+		  		$('#reseller-content').append('<tr><td><img src="'+img +'" height="50"/></td><td>'+ value.name + ' </td><td> ' 
+		  		+ value.real_name +'</td><td><a href="'+customer+'">普通用戶</a></td><td><a href="'+resller+'">下線用戶</a></td></tr>');
+		  	});
+		  	
+
+		  },
+		 
+		 
+		});
+
+ 	}); 
+});
+
+
+</script>
+
+
+	<div class="container">
+
+		<div class="rows">
+			<div class="col-sm-12 col-md-12 mt-2">
+				<form>
+				   <div class="form-group">
+				    <label for="exampleFormControlInput1">分銷商電話號碼</label>
+				    <input type="text" class="form-control" id="mobile" placeholder="請輸入你的電話號碼">
+				  </div>
+				  <button type="button" id="findUser" class="btn btn-primary">提交</button>
+				</form>
+		</div>
+
+		<div class="rows">
+
+			<div class="col-sm-12 col-md-12 mt-2">
+				<div class="card">
+	        				<div class="card-header">分銷商</div>
+	        				
+	        		
+	           				<div class="card-body">
+	           					<table  id="reseller-content">
+	           					</table>
+	           				</div> 
+
+
+	        	</div>
+
+	        </div>
+
+		</div>
+	</div>
+
+
+
+
+
+</body>
+</html>
